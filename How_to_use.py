@@ -7,8 +7,7 @@ import numpy as np
 # Be aware that the path might be different.
 
 from utils import download_edf, create_KNN
-from create_dataset import create_dataset
-from filter_dataset import apply_filters
+from working_with_the_data import create_dataset, apply filters
 
 from corrected_ttest import dependent_ttest_kfold
 from corrected_ttest import dependent_ttest_kfold_one_tail
