@@ -438,3 +438,188 @@ def PLI(epoch):
             PLI[i, j] = abs(np.mean(np.sign(np.angle(np.divide(complex_sig[:, i],complex_sig[:, j])))));
             PLI[j, i] = PLI[i, j];
     return PLI
+
+  def filter_ScorEpochs_remove_epochs_on_group_level(dataset, labels, scores, idx, percentage, worst, random, tot_conditions, subject_start, subject_end):
+  """
+  This function removes a percentage of epochs from the initial dataset on a group level, creating a new dataset. It can remove the worst, the best or random epochs.
+  
+  INPUT
+    dataset: the initial dataset, the 2d features matrix
+    labels: array of the initial labels, with size == len(dataset[0])
+    scores: array of scores assigned to each epoch by ScorEpochs (has same size as labels)
+    idx: array of assigned ids to each epoch (has same size as labels) 
+    percentage: integer, percentage of epochs kept to create the new dataset from the initial one (1 - percentage is the percentage of removed epochs)
+    worst: Boolean, if True the epochs with the lowest scores assigned by ScorEpochs will be chosen to be removed
+    random: Boolean, if True random epochs will be chosen to be removed (if both random and worst are False, the epochs with highest scores will be removed)
+    tot_conditions: integer, total conditions of interest
+    subject_start: integer, first subject in the initial dataset (included)
+    subject_end:  integer, last subject in the initial excluded
+
+  OUTPUT
+    new_dataset: 2d list of features after the removal
+    new_labels: array of labels corresponding to the kept epochs after the removal
+    new_scores: array of scores corresponding to the kept epochs after the removal
+
+  """
+  cnt_ec = 0 # Counts how many epochs are labeled as EC
+  cnt_eo = 0 # Counts how many epochs are labeled as EO
+  j = 0 # Auxiliar index to keep track of epochs in the initial dataset
+  new_tot_epoch = int(percentage * len(labels)) # Number of epochs in the whole new dataset
+  max_ec = int(new_tot_epoch / 2) # Maximum number of EC epochs possible in order to avoid an unbalanced new dataset (half of the total number of epochs)
+  max_eo = new_tot_epoch - max_ec # Maximum number of EO epochs possible in order to avoid an unbalanced new dataset
+  new_dataset = np.zeros((new_tot_epoch, len(dataset[0])))
+  new_labels = np.zeros(new_tot_epoch)
+  new_scores = np.zeros(new_tot_epoch)
+  if random: # If the new dataset results from the removal of random epochs, consider random indeces
+    indeces = np.arange(len(scores))
+    np.random.shuffle(indeces)
+  else: # If the new dataset does not result from the removal of random epochs, sort the indeces from the lowest score to the highest
+    indeces = np.argsort(scores)
+    if worst: # If the removed epochs are meant to be the worst, invert the order of the indeces
+      indeces = indeces[::-1]
+  for i in range(new_tot_epoch):
+    """
+    To avoid an unbalanced dataset, in the new dataset the amount of EC and EO epochs will be kept track, the i index is used to
+    scroll through the entries of the new dataset (and new labels and scores arrays), whereas the j index is used to scroll the 
+    initial dataset and eventually skip its entries when the maximum amount of a one class is hit. This way the indeces 
+    will provide the best/worst/randomly sorted epochs for each class.
+    """
+    if idx[indeces[j]] > 0 and cnt_eo < max_eo:
+      new_dataset[i] = dataset[indeces[j]]
+      new_labels[i] = labels[indeces[j]]
+      new_scores[i] = scores[indeces[j]]
+      cnt_eo += 1
+      j += 1
+    elif idx[indeces[j]] < 0 and cnt_ec < max_ec:
+      new_dataset[i] = dataset[indeces[j]]
+      new_labels[i] = labels[indeces[j]]
+      new_scores[i] = scores[indeces[j]]
+      cnt_ec += 1
+      j += 1
+    else:
+      j += 1
+  return new_dataset, new_labels, new_scores
+
+def filter_ScorEpochs_remove_epochs_user_condition_specific(dataset, labels, scores, idx, percentage, worst, random, tot_conditions, subject_start, subject_end):
+  """
+  This function removes a percentage of epochs from the initial dataset with the approach specific for user and condition, creating a new dataset. 
+  It can remove the worst, the best or random epochs.
+
+  INPUT
+    dataset: the initial dataset, the 2d features matrix
+    labels: array of the initial labels, with size == len(dataset[0])
+    scores: array of scores assigned to each epoch by ScorEpochs (has same size as labels)
+    idx: array of assigned ids to each epoch (has same size as labels) 
+    percentage: integer, percentage of epochs kept to create the new dataset from the initial one (1 - percentage is the percentage of removed epochs)
+    worst: Boolean, if True the epochs with the lowest scores assigned by ScorEpochs will be chosen to be removed
+    random: Boolean, if True random epochs will be chosen to be removed (if both random and worst are False, the epochs with highest scores will be removed)
+    tot_conditions: integer, total conditions of interest
+    subject_start: integer, first subject in the initial dataset (included)
+    subject_end:  integer, last subject in the initial excluded
+
+  OUTPUT
+    new_dataset: 2d list of features after the removal
+    new_labels: array of labels corresponding to the kept epochs after the removal
+    new_scores: array of scores corresponding to the kept epochs after the removal
+    
+  """
+  new_tot_epoch_per_user_and_condition = int(percentage * len(idx[idx == 1])) # Number of epochs per user and condition
+  new_dataset = []
+  new_labels = []
+  new_scores = []
+  for condition in range(tot_conditions):
+    for subject in range(subject_start, subject_end):
+      if subject not in [88, 92, 100]:
+        if condition == 0:
+          id_des = subject
+        else:
+          id_des = -subject
+        bool_id = idx == id_des
+        idx_ep = list(zip(*np.where(idx == id_des))) # List of the epochs' indeces of the specific subject and condition identified as id_des
+        if random: # If the new dataset results from the removal of random epochs, consider random indeces
+          indeces_per_user_and_condition = np.arange(len(scores[bool_id]))
+          np.random.shuffle(indeces_per_user_and_condition)
+        else: # If the new dataset does not result from the removal of random epochs, sort the indeces from the lowest score to the highest 
+          indeces_per_user_and_condition = np.argsort(scores[bool_id]) 
+          if worst: # If the removed epochs are meant to be the worst, invert the order of the indeces
+            indeces_per_user_and_condition = indeces_per_user_and_condition[::-1]
+        for i in range(new_tot_epoch_per_user_and_condition):
+          # The indeces will provide the best/worst/randomly sorted epochs for subject and condition.
+          new_dataset.append(dataset[idx_ep[indeces_per_user_and_condition[i]]])
+          new_labels.append(labels[idx_ep[indeces_per_user_and_condition[i]]])
+          new_scores.append(scores[idx_ep[indeces_per_user_and_condition[i]]])
+      else:
+        continue
+  new_dataset = np.array(new_dataset)
+  new_labels = np.array(new_labels)
+  new_scores = np.array(new_scores)
+  return new_dataset, new_labels, new_scores
+
+def filter_ScorEpochs(dataset, labels, scores, idx, percentage, f, worst, random, kf, classifiers, tot_conditions, subject_start, subject_end):
+  """
+  This function perform the training and testing of the classifiers.
+
+  INPUT  
+    dataset: the initial dataset, the 2d features matrix
+    labels: array of the initial labels, with size == len(dataset[0])
+    scores: array of scores assigned to each epoch by ScorEpochs (has same size as labels)
+    idx: array of assigned ids to each epoch (has same size as labels) 
+    percentage: integer, percentage of epochs kept to create the new dataset from the initial one (1 - percentage is the percentage of removed epochs)
+    f: function that applies a filter (can be either filter_ScorEpochs_remove_epochs_on_group_level or filter_ScorEpochs_remove_epochs_user_condition_specific,
+       but eventually new ones can be added)
+    worst: Boolean, if True the epochs with the lowest scores assigned by ScorEpochs will be chosen to be removed
+    random: Boolean, if True random epochs will be chosen to be removed (if both random and worst are False, the epochs with highest scores will be removed)
+    kf: object created to perform the k-folds cross-validation
+    classifiers: list of classifiers used to perform the pattern recognition's task
+    tot_conditions: integer, total conditions of interest
+    subject_start: integer, first subject in the initial dataset (included)
+    subject_end:  integer, last subject in the initial excluded
+
+  OUTPUT
+    scores_kfold = 2d list of scores obtained by the classifiers for each test run, size = number of classifiers X number of splits
+  """
+  scores_kfold = np.zeros((len(classifiers), kf.get_n_splits(dataset, labels)))
+  # Filter the initial dataset to obtain a new one
+  X, y, scores = f(dataset, labels, scores, idx, percentage, worst, random, tot_conditions, subject_start, subject_end)
+  # Perform the classification with each classifier and store the results in scores_kfold
+  for idx_clf in range (len(classifiers)):
+    clf = classifiers[idx_clf]
+    idx_score = 0
+    for train_index, test_index in kf.split(X, y):
+      X_train, X_test = X[train_index], X[test_index]
+      y_train, y_test = y[train_index], y[test_index]
+      clf.fit(X_train, y_train)
+      score = clf.score(X_test, y_test)
+      scores_kfold[idx_clf][idx_score] = score
+      idx_score += 1
+  return scores_kfold
+
+def apply_filters(names, classifiers, kf, n_random, percentage, uc_specific, worst, random, conditions, subject_start, subject_end, X_all, y_all, scores_all, id):
+  """
+  Function that applies the filters
+  INPUT
+    names: list of the names of the classifiers used
+    classifiers: list of classifiers used to perform the pattern recognition's task
+    kf: object created to perform the k-folds cross-validation
+    n_random: integer, it defines how many tests will be run to estimate the performance when removing random epochs
+    percentage: integer, percentage of epochs kept to create the new dataset from the initial one (1 - percentage is the percentage of removed epochs)
+    uc_specific: Boolean, if True it is followed the approach specific per user and condition to create the new datasets; 
+                 if False the approach followed is the group level one
+    worst: Boolean, if True the epochs with the lowest scores assigned by ScorEpochs will be chosen to be removed
+    random: Boolean, if True random epochs will be chosen to be removed (if both random and worst are False, the epochs with highest scores will be removed)
+    conditions: integer, total conditions of interest
+    subject_start: integer, first subject in the initial dataset (included)
+    subject_end:  integer, last subject in the initial excluded
+    X_all: the initial dataset, the 2d features matrix 
+    y_all: array of the initial labels
+    scores_all: array of scores assigned to each epoch by ScorEpochs 
+    id: array of assigned ids to each epoch
+
+  OUTPUT
+    scores_removed_epochs: 2d list of accuracies obtained by the classifiers, size = number of classifiers X number of splits (in the k-folds cross-validation)
+  """
+  if uc_specific == False:
+    scores_removed_epochs = filter_ScorEpochs(X_all, y_all, scores_all, id, percentage, filter_ScorEpochs_remove_epochs_on_group_level, worst, random, kf, classifiers, conditions, subject_start, subject_end)
+  else:
+    scores_removed_epochs = filter_ScorEpochs(X_all, y_all, scores_all, id, percentage, filter_ScorEpochs_remove_epochs_user_condition_specific, worst, random, kf, classifiers, conditions, subject_start, subject_end)
+  return scores_removed_epochs
