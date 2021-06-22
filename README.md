@@ -7,7 +7,7 @@ In the file named How_to_use.py can be found a guided example on how to reproduc
 Consequently, it is very important that all the files included in this branch are downloaded and correctly imported in order for How_to_use.py to work properly. The path currently indicated in the files might be different for each user, so change it if needed.
 
   - working_with_the_data.py includes the fundamental functions to run the tests (except the ones needed to perform the t-tests):
-    - create_dataset() Creates the initial dataset;
+    - create_dataset() Creates the initial dataset to perform the pattern recognition's task;
     - apply_filters() Creates new datasets by removing a specified percentage of epochs from the initial dataset;
     - Other functions are included in the file, but these two are the ones that How_to_use.py will need to import to work.
 
