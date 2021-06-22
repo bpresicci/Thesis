@@ -9,7 +9,7 @@ import numpy as np
 from utils import download_edf, create_KNN
 from working_with_the_data import create_dataset, apply filters
 
-from corrected_ttest import dependent_ttest_kfold
+# from corrected_ttest import dependent_ttest_kfold Import this if the desired t-test is the two-tailed one.
 from corrected_ttest import dependent_ttest_kfold_one_tail
 
 from sklearn.model_selection import KFold
