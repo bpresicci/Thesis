@@ -4,7 +4,7 @@ This is the algorithm used to run the tests explained in my work of thesis.
 The algorithm is developed on Python 3.7.10
 
 In the file named How_to_use.py can be found a guided example on how to reproduce the tests. It uses the functions provided in the file named working_with_the_data.py, which needs the remaining files in the branch to work.
-Consequently, it is very important that all the files included in this branch are downloaded and correctly imported in order for How_to_use.py to work properly. The path currently indicated in files might be different for each user, so change it if needed.
+Consequently, it is very important that all the files included in this branch are downloaded and correctly imported in order for How_to_use.py to work properly. The path currently indicated in the files might be different for each user, so change it if needed.
 
   - working_with_the_data.py includes the fundamental functions to run the tests (except the ones needed to perform the t-tests):
     - create_dataset() Creates the initial dataset;
