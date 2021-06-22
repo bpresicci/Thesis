@@ -42,7 +42,7 @@ b = False                         # Boolean, True if it is desired to remove the
 # Downloads the edf files of the chosen dataset (has to be different if the chosen dataset is different)
 download_edf(subject_start, subject_end, conditions)
 
-# Creates the initial dataset
+# Creates the initial dataset (has to be different if the chosen dataset is different)
 X_all, y_all, scores_all, id_all = create_dataset(conditions, subject_start, subject_end, cfg, freq, check_nperseg, bands, pli)
 
 # Create object to perform the k-folds cross-validation (k = n_splits = 10)
