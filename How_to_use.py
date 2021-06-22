@@ -17,7 +17,7 @@ from sklearn.neighbors import KNeighborsClassifier
 
 alpha = 0.05                      # Used to perform the t-test
 subject_start = 1                 # Integer, first subject in the dataset (included)
-subject_end = 2                   # Integer, last subject excluded
+subject_end = 110                   # Integer, last subject excluded
 conditions = 2                    # Integer, total conditions of interest
 t_ep = 3                          # Integer, the window length (in seconds)
 fs = 160                          # Integer, sample frequency of the recordings
