@@ -67,10 +67,10 @@ Initialize the matrices that will store the accuracies obtained from all tests:
 KNN_w_scores, KNN_b_scores, KNN_r_scores_all, KNN_ucs_w_scores, KNN_ucs_b_scores, KNN_ucs_r_scores_all = create_KNN(perc, names, kf, n_random)
 
 """
-For each percentage in the perc array a new dataset will be created and the classification will be performed, which accuracies will be stored in the
-KNN_scores matrices just created. worst and random cannot be True at the same time, because the indeces are sorted based on them. In order to
-perform the filtering multiple times with a given percentage, it is compulsory to make sure that worst and random are not both True. Based on the
-inputs w (remove worst epochs), r (remove random epochs) and b (remove best epochs), worst and random can be properly set 
+For each percentage in the perc array a new dataset will be created and the classification will be performed. The accuracies will be stored in the
+KNN_scores matrices. "worst" and "random" cannot be True at the same time, because the indeces are sorted based on them. In order to
+perform the filtering multiple times with a given percentage, it is compulsory to make sure that "worst" and "random" are not both True. Based on the
+inputs w (remove worst epochs), r (remove random epochs) and b (remove best epochs), "worst" and "random" can be properly set 
 and the filtering can be performed more than once at a time.
 """
 for percentage, idx_perc in zip(perc, range(len(perc))):
