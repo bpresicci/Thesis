@@ -620,7 +620,19 @@ def apply_filters(names, classifiers, kf, n_random, percentage, uc_specific, wor
     scores_removed_epochs: 2d list of accuracies obtained by the classifiers, size = number of classifiers X number of splits (in the k-folds cross-validation)
   """
   if uc_specific == False:
-    scores_removed_epochs = filter_ScorEpochs(X_all, y_all, scores_all, id, percentage, filter_ScorEpochs_remove_epochs_on_group_level, worst, random, kf, classifiers, conditions, subject_start, subject_end)
+    if random == True:
+      scores_removed_epochs = []
+      for i in range(n_random):
+        scores_removed_epochs.append(filter_ScorEpochs(X_all, y_all, scores_all, id, percentage, filter_ScorEpochs_remove_epochs_on_group_level, worst, random, kf, classifiers, conditions, subject_start, subject_end))
+      scores_removed_epochs = np.array(scores_removed_epochs)
+    else:
+      scores_removed_epochs = filter_ScorEpochs(X_all, y_all, scores_all, id, percentage, filter_ScorEpochs_remove_epochs_on_group_level, worst, random, kf, classifiers, conditions, subject_start, subject_end)
   else:
-    scores_removed_epochs = filter_ScorEpochs(X_all, y_all, scores_all, id, percentage, filter_ScorEpochs_remove_epochs_user_condition_specific, worst, random, kf, classifiers, conditions, subject_start, subject_end)
+    if random == True:
+      scores_removed_epochs = []
+      for i in range(n_random):
+        scores_removed_epochs.append(filter_ScorEpochs(X_all, y_all, scores_all, id, percentage, filter_ScorEpochs_remove_epochs_user_condition_specific, worst, random, kf, classifiers, conditions, subject_start, subject_end))
+      scores_removed_epochs = np.array(scores_removed_epochs)
+    else:
+      scores_removed_epochs = filter_ScorEpochs(X_all, y_all, scores_all, id, percentage, filter_ScorEpochs_remove_epochs_user_condition_specific, worst, random, kf, classifiers, conditions, subject_start, subject_end)
   return scores_removed_epochs
