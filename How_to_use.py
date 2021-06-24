@@ -7,7 +7,7 @@ import numpy as np
 # Be aware that the path might be different.
 
 from utils import download_edf, create_KNN
-from working_with_the_data import create_dataset, apply filters
+from working_with_the_data import create_dataset, apply_filters
 
 # from corrected_ttest import dependent_ttest_kfold Import this if the desired t-test is the two-tailed one.
 from corrected_ttest import dependent_ttest_kfold_one_tail
