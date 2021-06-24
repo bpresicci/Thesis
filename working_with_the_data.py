@@ -372,7 +372,7 @@ def scorEpochs_PLI(cfg, data, bands):
     idx_best_ep = idx_best_ep[::-1]                             # Reversing to obtain the descending order (from the best to the worst)
     return idx_best_ep, epochs, score_x_ep
   
- def filter_data(raw_data, srate, bands):
+def filter_data(raw_data, srate, bands):
     """
      Function that applies a filter to the frequencies.
 
