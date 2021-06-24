@@ -372,7 +372,7 @@ def scorEpochs_PLI(cfg, data, bands):
     idx_best_ep = idx_best_ep[::-1]                             # Reversing to obtain the descending order (from the best to the worst)
     return idx_best_ep, epochs, score_x_ep
   
-  def filter_data(raw_data, srate, bands):
+ def filter_data(raw_data, srate, bands):
     """
      Function that applies a filter to the frequencies.
 
@@ -439,7 +439,7 @@ def PLI(epoch):
             PLI[j, i] = PLI[i, j];
     return PLI
 
-  def filter_ScorEpochs_remove_epochs_on_group_level(dataset, labels, scores, idx, percentage, worst, random, tot_conditions, subject_start, subject_end):
+def filter_ScorEpochs_remove_epochs_on_group_level(dataset, labels, scores, idx, percentage, worst, random, tot_conditions, subject_start, subject_end):
   """
   This function removes a percentage of epochs from the initial dataset on a group level, creating a new dataset. It can remove the worst, the best or random epochs.
   
@@ -499,6 +499,7 @@ def PLI(epoch):
     else:
       j += 1
   return new_dataset, new_labels, new_scores
+
 
 def filter_ScorEpochs_remove_epochs_user_condition_specific(dataset, labels, scores, idx, percentage, worst, random, tot_conditions, subject_start, subject_end):
   """
